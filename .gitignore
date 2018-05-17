@@ -1,0 +1,4 @@
+*.pyc
+vendor*
+.mypy_cache
+__pycache__
