@@ -1,6 +1,6 @@
-from typing import AsyncGenerator, Optional
+from typing import Callable, Optional, Awaitable
 
-Notifier = AsyncGenerator[Optional[Exception], str]
+Notifier = Callable[[str], Awaitable[Optional[Exception]]]
 
 
 async def print_notifier(username: str) -> Optional[Exception]:

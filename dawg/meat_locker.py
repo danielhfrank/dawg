@@ -18,16 +18,16 @@ class MeatLocker(object):
         self.locker: Dict[str, Union[NotificationRequest, Tombstone]] = {}
         self.notifier: Notifier = print_notifier
 
-    def store(self, notification_request: NotificationRequest) -> bool:
+    async def store(self, notification_request: NotificationRequest) -> bool:
         self.locker[notification_request.request_id] = notification_request
-        self.maybe_fire(notification_request.request_id)
-        return True
         # TODO syntax for calling fire later
+        result = await self.maybe_fire(notification_request.request_id)
+        return True
 
     async def maybe_fire(self, request_id: str) -> bool:
         notification_request = self.locker[request_id]
         if isinstance(notification_request, NotificationRequest):
-            result: Optional[Exception] = self.notifier(notification_request.username)
+            result: Optional[Exception] = await self.notifier(notification_request.username)
             return (result is None)
         else:
             return False

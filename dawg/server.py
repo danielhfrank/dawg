@@ -4,17 +4,14 @@ from asyncio import AbstractEventLoop
 
 from aiohttp import web, ClientSession
 
-
-async def handle(request: web.Request) -> web.Response:
-    name = request.match_info.get('name', "Anonymous")
-    text = "Hello, " + name
-    return web.Response(text=text)
+from meat_locker import MeatLocker, NotificationRequest
 
 
 class DawgServer(object):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.session = ClientSession()
+        self.meat_locker = MeatLocker(30.0)
 
     async def fwd(self, request: web.Request) -> web.Response:
         fwd_path = request.match_info.get('fwd_path')
@@ -22,6 +19,13 @@ class DawgServer(object):
         client_resp = await self.session.get(url)
         client_resp_text = await client_resp.text()
         return web.Response(text=client_resp_text)
+
+    async def store(self, request):
+        req_id = request.match_info.get('id')
+        notification_request = NotificationRequest(req_id, 'df')
+        await self.meat_locker.store(notification_request)
+        return web.Response()
+
 
     def close(self):
         self.session.close()
@@ -31,9 +35,8 @@ async def prepare_app() -> web.Application:
     app = web.Application()
     server = DawgServer()
 
-    app.add_routes([web.get('/', handle),
-                    web.get('/{name}', handle),
-                    web.get('/fwd/{fwd_path}', server.fwd)])
+    app.add_routes([web.get('/fwd/{fwd_path}', server.fwd),
+                    web.get('/store/{id}', server.store)])
     return app
 
 
