@@ -9,9 +9,9 @@ from meat_locker import MeatLocker, NotificationRequest
 
 class DawgServer(object):
 
-    def __init__(self) -> None:
+    def __init__(self, loop: AbstractEventLoop) -> None:
         self.session = ClientSession()
-        self.meat_locker = MeatLocker(30.0)
+        self.meat_locker = MeatLocker(loop, 10.0)
 
     async def fwd(self, request: web.Request) -> web.Response:
         fwd_path = request.match_info.get('fwd_path')
@@ -26,19 +26,27 @@ class DawgServer(object):
         await self.meat_locker.store(notification_request)
         return web.Response()
 
+    async def ack(self, request):
+        req_id = request.match_info.get('id')
+        try:
+            self.meat_locker.complete(req_id)
+        except KeyError:
+            raise web.HTTPNotFound()
+        return web.Response(text=f"Acknowledged request {req_id}")
 
     def close(self):
         self.session.close()
 
 
-async def prepare_app() -> web.Application:
+async def prepare_app(loop) -> web.Application:
     app = web.Application()
-    server = DawgServer()
+    server = DawgServer(loop=loop)
 
     app.add_routes([web.get('/fwd/{fwd_path}', server.fwd),
-                    web.get('/store/{id}', server.store)])
+                    web.get('/store/{id}', server.store),
+                    web.get('/ack/{id}', server.ack)])
     return app
 
 
 def run_server(loop: AbstractEventLoop):
-    web.run_app(prepare_app())
+    web.run_app(prepare_app(loop))

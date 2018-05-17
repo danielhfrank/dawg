@@ -1,3 +1,4 @@
+from asyncio import AbstractEventLoop, ensure_future
 from typing import Dict, NamedTuple, NewType, Union, Optional
 
 from notifier import Notifier, print_notifier
@@ -13,24 +14,28 @@ Tombstone = NewType('Tombstone', int)
 
 class MeatLocker(object):
 
-    def __init__(self, ack_timeout: float) -> None:
+    def __init__(self, loop: AbstractEventLoop, ack_timeout: float) -> None:
+        self.loop = loop
         self.ack_timeout = ack_timeout
         self.locker: Dict[str, Union[NotificationRequest, Tombstone]] = {}
         self.notifier: Notifier = print_notifier
 
-    async def store(self, notification_request: NotificationRequest) -> bool:
+    async def store(self, notification_request: NotificationRequest) -> None:
         self.locker[notification_request.request_id] = notification_request
-        # TODO syntax for calling fire later
-        result = await self.maybe_fire(notification_request.request_id)
-        return True
+
+        def fire_future():
+            ensure_future(self.maybe_fire(notification_request.request_id))
+        self.loop.call_later(self.ack_timeout, fire_future)
 
     async def maybe_fire(self, request_id: str) -> bool:
-        notification_request = self.locker[request_id]
+        notification_request = self.locker.pop(request_id)
         if isinstance(notification_request, NotificationRequest):
-            result: Optional[Exception] = await self.notifier(notification_request.username)
+            result: Optional[Exception] = await \
+                self.notifier(notification_request.username)
             return (result is None)
         else:
             return False
 
     def complete(self, request_id: str):
-        pass
+        self.locker.pop(request_id)
+        self.locker[request_id] = Tombstone(0)
