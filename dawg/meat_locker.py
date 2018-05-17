@@ -20,7 +20,7 @@ class MeatLocker(object):
         self.locker: Dict[str, Union[NotificationRequest, Tombstone]] = {}
         self.notifier: Notifier = print_notifier
 
-    async def store(self, notification_request: NotificationRequest) -> None:
+    async def arm(self, notification_request: NotificationRequest) -> None:
         self.locker[notification_request.request_id] = notification_request
 
         def fire_future():
