@@ -28,8 +28,8 @@ class DawgServer(object):
             raise web.HTTPNotFound()
         return web.Response(text=f"Acknowledged request {req_id}")
 
-    def close(self):
-        self.session.close()
+    async def close(self, app):
+        await self.session.close()
 
 
 async def prepare_app(loop) -> web.Application:
@@ -38,6 +38,7 @@ async def prepare_app(loop) -> web.Application:
 
     app.add_routes([web.get('/arm/{id}', server.arm),
                     web.get('/ack/{id}', server.ack)])
+    app.on_shutdown.append(server.close)
     return app
 
 
