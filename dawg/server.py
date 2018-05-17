@@ -15,7 +15,8 @@ class DawgServer(object):
 
     async def arm(self, request):
         req_id = request.match_info.get('id')
-        notification_request = NotificationRequest(req_id, 'df')
+        username = request.query['username']
+        notification_request = NotificationRequest(req_id, username)
         await self.meat_locker.arm(notification_request)
         return web.Response()
 
