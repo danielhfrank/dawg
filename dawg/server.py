@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from asyncio import AbstractEventLoop
+from typing import Optional
 
 from aiohttp import web, ClientSession
 
@@ -10,7 +11,6 @@ from meat_locker import MeatLocker, NotificationRequest
 class DawgServer(object):
 
     def __init__(self, loop: AbstractEventLoop) -> None:
-        self.session = ClientSession()
         self.meat_locker = MeatLocker(loop, 10.0)
 
     async def arm(self, request):
@@ -28,19 +28,22 @@ class DawgServer(object):
             raise web.HTTPNotFound()
         return web.Response(text=f"Acknowledged request {req_id}")
 
-    async def close(self, app):
-        await self.session.close()
 
-
-async def prepare_app(loop) -> web.Application:
+async def prepare_app(loop: AbstractEventLoop,
+                      yo_api_key: Optional[str]) -> web.Application:
     app = web.Application()
+    client_session = ClientSession()
+    # TODO create notifier here
+
+    async def close(app):
+        await client_session.close()
     server = DawgServer(loop=loop)
 
     app.add_routes([web.get('/arm/{id}', server.arm),
                     web.get('/ack/{id}', server.ack)])
-    app.on_shutdown.append(server.close)
+    app.on_shutdown.append(close)
     return app
 
 
-def run_server(loop: AbstractEventLoop):
-    web.run_app(prepare_app(loop))
+def run_server(loop: AbstractEventLoop, api_key: Optional[str]) -> None:
+    web.run_app(prepare_app(loop, api_key))
