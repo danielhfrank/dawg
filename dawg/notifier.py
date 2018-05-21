@@ -14,5 +14,7 @@ def mk_yo_notifier(client_session: ClientSession, api_key: str) -> Notifier:
     async def yo_notify(username: str) -> Optional[Exception]:
         url = "http://localhost:8000/df.txt"
         async with client_session.get(url) as response:
+            txt = await response.text()
+            print(txt)
             return None
     return yo_notify

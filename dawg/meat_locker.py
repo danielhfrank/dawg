@@ -1,7 +1,7 @@
 from asyncio import AbstractEventLoop, ensure_future
 from typing import Dict, NamedTuple, NewType, Union, Optional
 
-from notifier import Notifier, print_notifier
+from notifier import Notifier
 
 
 class NotificationRequest(NamedTuple):
@@ -14,11 +14,15 @@ Tombstone = NewType('Tombstone', int)
 
 class MeatLocker(object):
 
-    def __init__(self, loop: AbstractEventLoop, ack_timeout: float) -> None:
+    def __init__(self,
+                 loop: AbstractEventLoop,
+                 ack_timeout: float,
+                 notifier: Notifier) -> None:
+
         self.loop = loop
         self.ack_timeout = ack_timeout
         self.locker: Dict[str, Union[NotificationRequest, Tombstone]] = {}
-        self.notifier: Notifier = print_notifier
+        self.notifier: Notifier = notifier
 
     async def arm(self, notification_request: NotificationRequest) -> None:
         self.locker[notification_request.request_id] = notification_request

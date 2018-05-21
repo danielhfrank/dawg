@@ -6,12 +6,13 @@ from typing import Optional
 from aiohttp import web, ClientSession
 
 from meat_locker import MeatLocker, NotificationRequest
+from notifier import print_notifier, mk_yo_notifier, Notifier
 
 
 class DawgServer(object):
 
-    def __init__(self, loop: AbstractEventLoop) -> None:
-        self.meat_locker = MeatLocker(loop, 10.0)
+    def __init__(self, loop: AbstractEventLoop, notifier: Notifier) -> None:
+        self.meat_locker = MeatLocker(loop, 10.0, notifier)
 
     async def arm(self, request):
         req_id = request.match_info.get('id')
@@ -34,10 +35,14 @@ async def prepare_app(loop: AbstractEventLoop,
     app = web.Application()
     client_session = ClientSession()
     # TODO create notifier here
+    if yo_api_key is not None:
+        notifier = mk_yo_notifier(client_session, yo_api_key)
+    else:
+        notifier = print_notifier
 
     async def close(app):
         await client_session.close()
-    server = DawgServer(loop=loop)
+    server = DawgServer(loop=loop, notifier=notifier)
 
     app.add_routes([web.get('/arm/{id}', server.arm),
                     web.get('/ack/{id}', server.ack)])
