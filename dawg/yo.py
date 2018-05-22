@@ -23,7 +23,7 @@ def mk_yo_notifier(client_session: ClientSession, api_key: str) -> Notifier:
 
 
 async def main(argv: List[str]) -> None:
-    api_key = argv[0]
+    api_key = argv[1]
     async with ClientSession() as client_session:
         notifier = mk_yo_notifier(client_session, api_key)
         await notifier('dfbot')
