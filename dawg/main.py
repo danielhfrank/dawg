@@ -10,7 +10,8 @@ import server
 def main(argv: List[str]):
     parser = ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--test', action='store_true', help='Just print username')
+    group.add_argument('--test', action='store_true',
+                       help='Just print username')
     group.add_argument('--yo-api-key')
     args = parser.parse_args()
     loop = get_event_loop()
