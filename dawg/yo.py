@@ -9,12 +9,15 @@ from aiohttp import ClientSession
 from notifier import Notifier
 
 
+YO_URL = 'https://api.justyo.co/yo/'
+
+
 def mk_yo_notifier(client_session: ClientSession, api_key: str) -> Notifier:
     async def yo_notify(username: str) -> Optional[Exception]:
-        url = "http://localhost:8000/df.txt"
-        async with client_session.get(url) as response:
-            txt = await response.text()
-            print(txt)
+        post_data = {'username': username, 'api_token': api_key}
+        async with client_session.post(YO_URL, data=post_data) as response:
+            response_data = await response.json()
+            print(response_data)
             return None
     return yo_notify
 
@@ -23,9 +26,7 @@ async def main(argv: List[str]) -> None:
     api_key = argv[0]
     async with ClientSession() as client_session:
         notifier = mk_yo_notifier(client_session, api_key)
-        response = await notifier('dfbot')
-        print(response)
-        return None
+        await notifier('dfbot')
 
 if __name__ == '__main__':
     loop = get_event_loop()
