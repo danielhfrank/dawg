@@ -6,8 +6,9 @@ from typing import Optional
 from aiohttp import web, ClientSession
 
 from meat_locker import MeatLocker, NotificationRequest
-from notifier import print_notifier, Notifier
+from notifier import print_notifier, Notifier, APIToken, NotifierType
 from yo import mk_yo_notifier
+from pushover import mk_pushover_notifier
 
 
 class DawgServer(object):
@@ -32,11 +33,14 @@ class DawgServer(object):
 
 
 async def prepare_app(loop: AbstractEventLoop,
-                      yo_api_key: Optional[str]) -> web.Application:
+                      api_token: Optional[APIToken]) -> web.Application:
     app = web.Application()
     client_session = ClientSession()
-    if yo_api_key is not None:
-        notifier = mk_yo_notifier(client_session, yo_api_key)
+    if api_token is not None:
+        if api_token.notifier_type is NotifierType.YO:
+            notifier = mk_yo_notifier(client_session, api_token.token)
+        else:
+            notifier = mk_pushover_notifier(client_session, api_token.token)
     else:
         notifier = print_notifier
 
