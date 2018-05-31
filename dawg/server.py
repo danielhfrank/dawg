@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from asyncio import AbstractEventLoop
+import os
 from typing import Optional
 
 from aiohttp import web, ClientSession
@@ -55,4 +56,5 @@ async def prepare_app(loop: AbstractEventLoop,
 
 
 def run_server(loop: AbstractEventLoop, api_key: Optional[str]) -> None:
-    web.run_app(prepare_app(loop, api_key))
+    port = os.environ.get('PORT')
+    web.run_app(prepare_app(loop, api_key), port=port)
