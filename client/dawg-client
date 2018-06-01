@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+REQ_ID=$(uuidgen)
+
+ACK_CMD="curl $DAWG_URL/ack/$REQ_ID"
+
+# First arm the request on the server
+curl "$DAWG_URL/arm/$REQ_ID?username=$DAWG_USER"
+
+# Now send the local notification with callback to disarm
+terminal-notifier -message "yo dawg" -title dawg -execute $ACK_CMD
