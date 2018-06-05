@@ -2,7 +2,7 @@ from enum import Enum, auto
 from typing import Callable, Optional, Awaitable, NamedTuple
 
 
-Notifier = Callable[[str], Awaitable[Optional[Exception]]]
+Notifier = Callable[[str, str], Awaitable[Optional[Exception]]]
 
 
 class NotifierType(Enum):
@@ -16,6 +16,6 @@ class APIToken(NamedTuple):
     token: str
 
 
-async def print_notifier(username: str) -> Optional[Exception]:
-    print(username)
+async def print_notifier(username: str, message: str) -> Optional[Exception]:
+    print(f'{username}: {message}')
     return None
