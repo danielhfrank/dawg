@@ -11,7 +11,7 @@ REQ_ID=$(uuidgen)
 ACK_CMD="curl $DAWG_URL/ack/$REQ_ID"
 
 # First arm the request on the server
-curl  --get "$DAWG_URL/arm/$REQ_ID" \
+curl -v --get "$DAWG_URL/arm/$REQ_ID" \
     --data-urlencode "message=$MSG" --data-urlencode "username=$DAWG_USER"
 
 # Now send the local notification with callback to disarm

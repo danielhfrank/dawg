@@ -7,6 +7,7 @@ from dawg.notifier import Notifier
 class NotificationRequest(NamedTuple):
     request_id: str
     username: str
+    message: str
 
 
 Tombstone = NewType('Tombstone', int)
@@ -35,7 +36,7 @@ class MeatLocker(object):
         notification_request = self.locker.pop(request_id)
         if isinstance(notification_request, NotificationRequest):
             result: Optional[Exception] = await \
-                self.notifier(notification_request.username)
+                self.notifier(notification_request.username, notification_request.message)
             return (result is None)
         else:
             return False
