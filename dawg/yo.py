@@ -6,7 +6,7 @@ import sys
 
 from aiohttp import ClientSession
 
-from notifier import Notifier
+from dawg.notifier import Notifier
 
 
 YO_URL = 'https://api.justyo.co/yo/'

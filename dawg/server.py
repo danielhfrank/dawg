@@ -6,10 +6,10 @@ from typing import Optional
 
 from aiohttp import web, ClientSession
 
-from meat_locker import MeatLocker, NotificationRequest
-from notifier import print_notifier, Notifier, APIToken, NotifierType
-from yo import mk_yo_notifier
-from pushover import mk_pushover_notifier
+from dawg.meat_locker import MeatLocker, NotificationRequest
+from dawg.notifier import print_notifier, Notifier, APIToken, NotifierType
+from dawg.yo import mk_yo_notifier
+from dawg.pushover import mk_pushover_notifier
 
 
 class DawgServer(object):

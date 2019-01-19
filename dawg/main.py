@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 from typing import List
 import sys
 
-from notifier import APIToken, NotifierType
-import server
+from dawg.notifier import APIToken, NotifierType
+import dawg.server as server
 
 
 def main(argv: List[str]):

@@ -1,7 +1,7 @@
 from asyncio import AbstractEventLoop, ensure_future
 from typing import Dict, NamedTuple, NewType, Union, Optional
 
-from notifier import Notifier
+from dawg.notifier import Notifier
 
 
 class NotificationRequest(NamedTuple):
