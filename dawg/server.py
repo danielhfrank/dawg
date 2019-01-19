@@ -55,6 +55,7 @@ async def prepare_app(loop: AbstractEventLoop,
     return app
 
 
-def run_server(loop: AbstractEventLoop, api_key: Optional[str]) -> None:
-    port = os.environ.get('PORT')
+def run_server(loop: AbstractEventLoop, api_key: Optional[APIToken]) -> None:
+    maybe_port_str = os.environ.get('PORT')
+    port = int(maybe_port_str) if maybe_port_str is not None else None
     web.run_app(prepare_app(loop, api_key), port=port)
