@@ -6,7 +6,7 @@ import sys
 
 from aiohttp import ClientSession
 
-from notifier import Notifier
+from dawg.notifier import Notifier
 
 
 API_URL = 'https://api.pushover.net/1/messages.json'

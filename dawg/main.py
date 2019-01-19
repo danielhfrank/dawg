@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 from typing import List
 import sys
 
-from notifier import APIToken, NotifierType
-import server
+from dawg.notifier import APIToken, NotifierType
+import dawg.server as server
 
 
 def main(argv: List[str]):
@@ -17,12 +17,11 @@ def main(argv: List[str]):
     group.add_argument('--pushover-api-token')
     args = parser.parse_args()
     loop = get_event_loop()
+    api_token = None
     if args.yo_api_token:
         api_token = APIToken(NotifierType.YO, args.yo_api_token)
     elif args.pushover_api_token:
         api_token = APIToken(NotifierType.PUSHOVER, args.pushover_api_token)
-    else:
-        api_token = None
     server.run_server(loop, api_token)
 
 

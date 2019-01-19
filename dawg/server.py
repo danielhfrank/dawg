@@ -6,10 +6,10 @@ from typing import Optional
 
 from aiohttp import web, ClientSession
 
-from meat_locker import MeatLocker, NotificationRequest
-from notifier import print_notifier, Notifier, APIToken, NotifierType
-from yo import mk_yo_notifier
-from pushover import mk_pushover_notifier
+from dawg.meat_locker import MeatLocker, NotificationRequest
+from dawg.notifier import print_notifier, Notifier, APIToken, NotifierType
+from dawg.yo import mk_yo_notifier
+from dawg.pushover import mk_pushover_notifier
 
 
 class DawgServer(object):
@@ -55,6 +55,7 @@ async def prepare_app(loop: AbstractEventLoop,
     return app
 
 
-def run_server(loop: AbstractEventLoop, api_key: Optional[str]) -> None:
-    port = os.environ.get('PORT')
+def run_server(loop: AbstractEventLoop, api_key: Optional[APIToken]) -> None:
+    maybe_port_str = os.environ.get('PORT')
+    port = int(maybe_port_str) if maybe_port_str is not None else None
     web.run_app(prepare_app(loop, api_key), port=port)
